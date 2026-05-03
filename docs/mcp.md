@@ -15,6 +15,14 @@ You probably want `[all]` so the server can handle every source type. If
 you only care about web extraction, `pip install 'docink[web,mcp]'` is
 enough.
 
+Readwise Reader support also requires the official CLI to be installed and
+authenticated outside Python:
+
+```bash
+npm install -g @readwise/cli
+readwise login
+```
+
 ## Run
 
 ```bash
@@ -114,9 +122,9 @@ You should see a JSON response describing the server.
 
 ## Limitations
 
-- **No auth.** The server pulls whatever URL you point it at. If you need
-  authenticated sources (Google Drive, Notion, Slack), the adapter has to
-  handle that — it's not at the MCP layer.
+- **Adapter-owned auth.** The server pulls whatever URL you point it at.
+  Authenticated sources handle auth inside the adapter. For example, the
+  Readwise adapter relies on the user's local `readwise` CLI login.
 - **Single-shot.** Each `extract` call fetches fresh. There's no caching.
   Wrap with a caching MCP middleware if you need it.
 - **Process per call.** The agent launches `docink-mcp` once per session,

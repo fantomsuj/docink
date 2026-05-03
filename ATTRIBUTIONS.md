@@ -12,9 +12,9 @@ distribution channel; we don't vendor or redistribute their source.
 - **What it does:** HTML article extraction with metadata recovery.
 - **Why we use it:** Solid pure-Python fallback; ships on PyPI.
 
-### [defuddle](https://github.com/kepano/defuddle) (planned)
+### [defuddle](https://github.com/kepano/defuddle)
 - **License:** MIT (npm)
-- **Used by:** `docink.adapters.web` (planned primary backend)
+- **Used by:** `docink.adapters.web`
 - **What it does:** Browser-grade content extraction with strong boilerplate
   removal.
 - **Why we use it:** Best-in-class web extraction, including YouTube
@@ -42,6 +42,16 @@ distribution channel; we don't vendor or redistribute their source.
   other video platforms.
 - **Why we use it:** Robust, actively maintained, handles edge cases that
   break other extractors.
+
+## External services and CLIs
+
+### [Readwise CLI](https://github.com/readwiseio/readwise-cli)
+- **License:** No license declared in the npm package at time of integration.
+- **Used by:** `docink.adapters.readwise`
+- **What it does:** Authenticated access to Readwise and Reader documents.
+- **Why we use it:** The official CLI exposes Reader document details as
+  Markdown. `docink` shells out to a user-installed CLI and does not vendor
+  or redistribute it.
 
 ## Other dependencies
 

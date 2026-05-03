@@ -12,7 +12,7 @@ The top-level object returned by `extract(uri)`.
 |---|---|---|---|
 | `id` | `str` | yes | `sha256:` + 16 hex chars of `canonical_uri`. Stable across re-extractions of the same URI. |
 | `canonical_uri` | `str` | yes | The normalized form of the input URI. Tracking params stripped, query params sorted, fragment dropped. |
-| `source_type` | `str` | yes | One of `web`, `pdf`, `youtube`, `office`. New types added as adapters land. |
+| `source_type` | `str` | yes | One of `web`, `pdf`, `youtube`, `office`, `readwise`. New types added as adapters land. |
 | `fetched_at` | `datetime` | yes | UTC timestamp of extraction. |
 | `content_hash` | `str` | yes | `sha256:` + 16 hex chars of the markdown body. Detects body drift at a stable `id`. |
 | `markdown` | `str` | yes | Extracted body. May be empty if extraction returned nothing. |
@@ -97,6 +97,22 @@ Currently empty. Planned: `page_count`, `has_tables`, `has_images`.
 ### `office` extras
 
 Currently empty. Planned: `page_count` (docx/pptx), `sheet_count` (xlsx).
+
+### `readwise` extras
+
+| Key | Type | Description |
+|---|---|---|
+| `reader_document_id` | `str` | Reader document ID, when surfaced by the CLI. |
+| `reader_url` | `str` | Reader app URL for the saved document. |
+| `source_url` | `str` | Original source URL, when known. |
+| `category` | `str` | Reader category such as `article`, `pdf`, `video`, or `podcast`. |
+| `location` | `str` | Reader location such as `new`, `later`, `shortlist`, `archive`, or `feed`. |
+| `site_name` | `str` | Site/source name from Reader metadata. |
+| `word_count` | `int` | Reader's word count. |
+| `reading_time` | `str` | Reader's estimated reading time. |
+| `summary` | `str` | Reader summary, when available. |
+| `tags` | `dict \| list` | Reader tags as returned by the CLI. |
+| `created_from_url` | `str` | Present only for `readwise+https://...`; the URL docink asked Reader to save. |
 
 ## Stability guarantees
 

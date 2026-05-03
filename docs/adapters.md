@@ -43,6 +43,43 @@ don't see any of that.
 - Network/file errors → let them propagate. Don't wrap them in a generic
   exception that hides the cause.
 
+## Web backend comparison
+
+The web adapter uses `defuddle` first and falls back to `trafilatura`.
+For benchmark harnesses or one-off comparisons, call:
+
+```python
+from docink.adapters.web import extract_with_backend
+
+defuddle_doc = extract_with_backend(uri, backend="defuddle")
+trafilatura_doc = extract_with_backend(uri, backend="trafilatura")
+```
+
+The returned dict shape is the same as `extract()`, so benchmark code can
+compare output quality without special-casing backend payloads.
+
+## Readwise Reader adapter
+
+The `readwise` adapter is intentionally explicit because it uses an
+authenticated, stateful service rather than a stateless extractor.
+
+```bash
+npm install -g @readwise/cli
+readwise login
+
+docink "readwise://READER_DOCUMENT_ID"
+docink "https://read.readwise.io/new/read/READER_DOCUMENT_ID"
+docink "readwise+https://example.com/article"
+```
+
+`readwise://...` and Reader document URLs fetch an existing saved document.
+`readwise+https://...` first runs `readwise reader-create-document`, which
+can mutate the user's Reader library, then fetches the created document's
+Markdown with `reader-get-document-details`.
+
+Do not register bare `https://...` URLs to the Readwise adapter. Normal web
+extraction must remain account-free and non-mutating.
+
 ## Registry
 
 Add detection logic in `src/docink/registry.py`:

@@ -2,7 +2,7 @@
 
 Agent-readable extraction of any source into markdown — with stable IDs, provenance, and chunk addresses that survive re-extraction.
 
-`docink` is not another HTML-to-markdown converter. It's a thin, opinionated layer over the best existing extractors (defuddle, docling, markitdown, yt-dlp), unified behind one schema that agents can rely on.
+`docink` is not another HTML-to-markdown converter. It's a thin, opinionated layer over the best existing extractors (defuddle, docling, markitdown, yt-dlp), unified behind one schema that agents can rely on and benchmark.
 
 ## Why
 
@@ -14,17 +14,22 @@ Existing tools (Firecrawl, MarkItDown, Docling, defuddle, trafilatura) each do o
 - **Source-type dispatch** — one entry point for web, PDF, YouTube, Office docs.
 
 That uniformity is the product. The extractors underneath are interchangeable.
+It also makes extractor quality comparable: run multiple backends against the
+same source corpus, inspect the same schema, and choose the backend that fits
+your use case instead of guessing from one-off demos.
 
 ## Install
 
 ```bash
 pip install docink                  # core only
-pip install docink[web]             # + defuddle, trafilatura
+pip install docink[web]             # + trafilatura; defuddle runs through Node/npx
 pip install docink[pdf]             # + docling, markitdown
 pip install docink[youtube]         # + yt-dlp
 pip install docink[office]          # + markitdown
 pip install docink[all]             # everything
 pip install docink[mcp]             # + fastmcp for the MCP server
+npm install -g @readwise/cli        # optional: Readwise Reader adapter
+readwise login                      # optional: authenticate Readwise CLI
 ```
 
 ## CLI
@@ -34,6 +39,8 @@ docink https://example.com/article             # markdown to stdout
 docink https://example.com/article --json      # full Document as JSON
 docink ./paper.pdf --out ./extracted/          # write {id}.md + {id}.chunks.jsonl
 docink "https://youtu.be/VIDEO_ID"             # transcript with [hh:mm:ss] anchors
+docink "readwise://READER_DOCUMENT_ID"         # saved Reader doc via Readwise CLI
+docink "readwise+https://example.com/article"  # save to Reader, then extract
 ```
 
 ## Library
@@ -91,6 +98,7 @@ Sidecar `<id>.chunks.jsonl` (one chunk per line):
 | PDFs | `pdf` | docling (rich) or markitdown (fast) |
 | YouTube | `youtube` | yt-dlp transcript + chapters |
 | Office docs | `office` | markitdown (docx/pptx/xlsx) |
+| Readwise Reader | `readwise` | official Readwise CLI |
 
 Planned for v0.2: Slack export, Gmail, Drive, Notion, GitHub repos.
 

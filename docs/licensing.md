@@ -8,11 +8,14 @@ other open-source software.
 
 - **`docink` is MIT-licensed.** Permissive — anyone can use, modify,
   redistribute, including in proprietary software.
-- **All wrapped backends are permissive** (MIT / Apache 2.0 / Unlicense).
-  No GPL, no AGPL, no copyleft contagion.
-- **We don't vendor source.** Backends are installed via optional extras
-  (`pip install docink[web]`), so the user pulls them from their authoritative
-  source under their own license terms.
+- **All bundled/open-source parser backends are permissive** (MIT / Apache
+  2.0 / Unlicense). No GPL, no AGPL, no copyleft contagion.
+- **Readwise is different:** the Reader adapter shells out to the
+  user-installed official CLI for an authenticated SaaS account. We do not
+  vendor or redistribute the CLI.
+- **We don't vendor source.** Python backends are installed via optional extras
+  (`pip install docink[web]`), and npm backends run through their authoritative
+  npm packages, so users receive them under their own license terms.
 - **We attribute upstream** in [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) and the
   README.
 
@@ -21,12 +24,13 @@ other open-source software.
 | Backend | Used by | License | Notes |
 |---|---|---|---|
 | [trafilatura](https://github.com/adbar/trafilatura) | `web` adapter | Apache 2.0 | Permissive; requires NOTICE preservation if redistributed |
-| [defuddle](https://github.com/kepano/defuddle) (npm) | `web` adapter (planned) | MIT | Permissive |
+| [defuddle](https://github.com/kepano/defuddle) (npm) | `web` adapter | MIT | Permissive; resolved from `DEFUDDLE_BIN`, local `defuddle`, or `npx --yes defuddle@0.14.0` |
 | [markitdown](https://github.com/microsoft/markitdown) | `pdf`, `office` adapters | MIT | Permissive |
 | [docling](https://github.com/DS4SD/docling) | `pdf` adapter (planned) | MIT | Permissive |
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | `youtube` adapter | Unlicense | Public domain |
 | [fastmcp](https://github.com/jlowin/fastmcp) | MCP server | Apache 2.0 | Permissive; NOTICE if redistributed |
 | [pyyaml](https://pyyaml.org) | core | MIT | Permissive |
+| [Readwise CLI](https://github.com/readwiseio/readwise-cli) | `readwise` adapter | No license declared | External user-installed CLI for an authenticated SaaS account; not bundled or redistributed |
 
 **No copyleft (GPL/AGPL/LGPL) dependencies anywhere.** If you add a
 backend, check its license against this matrix before merging.
