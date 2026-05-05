@@ -2,9 +2,10 @@
 
 ## The one-line version
 
-`docink` is a dispatcher and a schema. The actual extraction is done by
-existing tools (defuddle, docling, markitdown, yt-dlp). The value is uniformity,
-not extraction quality.
+`docink` is a dispatcher, a schema, and a benchmark surface. The actual
+extraction is done by existing tools (defuddle, docling, markitdown, yt-dlp).
+The value is uniformity and evidence-based backend choice, not owning parser
+quality.
 
 ## Why this shape
 
@@ -24,6 +25,11 @@ one is good at its slice. None of them gives an agent:
 The cost of building those properties on top of an existing extractor is
 small. The benefit to an agent that ingests from many sources is large.
 That's the wedge.
+
+The same shape also lets users compare extractors honestly. If defuddle,
+trafilatura, docling, and markitdown all return the same `Document` fields,
+then benchmarks can focus on practical outcomes: retained body text, lost
+tables, boilerplate leakage, metadata recovery, latency, and install cost.
 
 ## The three things `docink` owns
 
@@ -76,7 +82,7 @@ detection, GitHub URL patterns, Notion export structure).
 - **Fetching.** Adapters call their backend's fetch logic directly. There's
   no `docink` HTTP client; if you need caching/retry, layer it outside.
 - **Parsing.** All HTML→markdown, PDF→markdown, etc. logic lives in the
-  wrapped tool. We don't compete on parser quality.
+  wrapped tool. We don't compete on parser quality; we make quality comparable.
 - **Storage.** `docink` returns a `Document`. Where it gets persisted (disk,
   S3, vector DB) is out of scope.
 - **Embedding.** Chunks are addressable, but `docink` doesn't compute
@@ -90,8 +96,10 @@ The library is designed to fail loudly:
 - Adapter can't extract → propagated exception with the source URI.
 - Unknown source type → `ValueError` listing supported types.
 
-There is no silent fallback to "best effort" extraction. An agent should
-know when extraction failed.
+Fallbacks are explicit in the returned payload. For example, the web adapter
+tries defuddle first, then records `extras.fallback_from` and
+`extras.backend_attempts` if it has to use trafilatura. An agent should know
+when extraction failed or degraded.
 
 ## The MCP server
 
@@ -105,12 +113,11 @@ ingestion for free, without needing to bundle `docink` into the agent itself.
 
 ## Roadmap notes
 
-- v0.1 — current scaffold. Web (trafilatura), PDF (markitdown), YouTube
-  (yt-dlp), Office (markitdown).
-- v0.2 — defuddle wrapping for web; docling for layout-rich PDFs;
-  Slack/Gmail/Notion exports.
-- v0.3 — pluggable chunking strategies; integration test harness with
-  golden fixtures per adapter.
+- v0.1 — current scaffold. Web (defuddle with trafilatura fallback), PDF
+  (markitdown), YouTube (yt-dlp), Office (markitdown).
+- v0.2 — docling for layout-rich PDFs; integration test and benchmark harness
+  with golden fixtures per adapter.
+- v0.3 — pluggable chunking strategies; Slack/Gmail/Notion exports.
 - v1.0 — schema freeze. Once the schema is stable enough to commit to,
   publish a `docink-schema` JSON Schema separately so other tools can
   produce compatible output.

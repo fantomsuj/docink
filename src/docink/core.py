@@ -87,7 +87,7 @@ def extract(uri: str) -> Document:
     if adapter is None:
         raise ValueError(
             f"No adapter for source_type={source_type!r} (uri={uri!r}). "
-            "Available: web, pdf, youtube, office."
+            "Available: web, pdf, youtube, office, readwise."
         )
 
     canonical = _ids.canonical_uri(uri)

@@ -10,6 +10,9 @@ OFFICE_EXTS = {".docx", ".pptx", ".xlsx", ".doc", ".ppt", ".xls"}
 def detect_source_type(uri: str) -> str:
     parsed = urlparse(uri)
 
+    if parsed.scheme in {"readwise", "reader", "readwise+http", "readwise+https"}:
+        return "readwise"
+
     if not parsed.scheme or parsed.scheme == "file":
         path_str = parsed.path if parsed.scheme == "file" else uri
         ext = Path(path_str).suffix.lower()
@@ -22,6 +25,11 @@ def detect_source_type(uri: str) -> str:
         return "unknown"
 
     host = parsed.netloc.lower()
+    if host in {"read.readwise.io", "reader.readwise.io"} or host.endswith(
+        ".read.readwise.io"
+    ):
+        return "readwise"
+
     if "youtube.com" in host or host.endswith("youtu.be"):
         return "youtube"
 
@@ -35,11 +43,12 @@ def detect_source_type(uri: str) -> str:
 
 
 def get_adapter(source_type: str) -> ModuleType | None:
-    from docink.adapters import office, pdf, web, youtube
+    from docink.adapters import office, pdf, readwise, web, youtube
 
     return {
         "web": web,
         "pdf": pdf,
         "youtube": youtube,
         "office": office,
+        "readwise": readwise,
     }.get(source_type)

@@ -30,7 +30,7 @@ rationale.
 | `src/docink/registry.py` | URI → adapter dispatch | Done |
 | `src/docink/cli.py` | `docink` CLI entry point | Done |
 | `src/docink/mcp/server.py` | FastMCP stdio server with two tools | Done |
-| `src/docink/adapters/web.py` | trafilatura backend | Done |
+| `src/docink/adapters/web.py` | defuddle backend + trafilatura fallback | Done |
 | `src/docink/adapters/pdf.py` | markitdown backend | Done |
 | `src/docink/adapters/youtube.py` | yt-dlp + VTT-to-markdown | Done |
 | `src/docink/adapters/office.py` | markitdown for docx/pptx/xlsx | Done |
@@ -39,23 +39,19 @@ rationale.
 
 ## What's not built (in priority order)
 
-1. **defuddle wrapper for the web adapter.** Currently `web` is
-   trafilatura-only. Add defuddle as the primary backend (via local node
-   binary or `npx defuddle@0.14.0`) with trafilatura as fallback. See
-   `partnership-crm/ground-truth/ground-truth/tools/defuddle` for a working
-   bash wrapper to model on.
-2. **docling backend for the PDF adapter.** Markitdown handles simple
+1. **docling backend for the PDF adapter.** Markitdown handles simple
    PDFs; docling handles tables, multi-column, figures. Pick backend via
    heuristic (file size + a quick layout sniff).
-3. **Integration test harness.** No live-URL tests exist. Add a
+2. **Integration test + benchmark harness.** No live-URL tests exist. Add a
    `tests/fixtures/<adapter>/` directory with golden files and a
-   `pytest -m integration` marker for tests that hit real URLs.
-4. **GitHub repo + CI.** Move out of `sandbox/`, push to GitHub, wire up
+   `pytest -m integration` marker for tests that hit real URLs. Use it to
+   compare backend quality, latency, and install cost under the same schema.
+3. **GitHub repo + CI.** Move out of `sandbox/`, push to GitHub, wire up
    GitHub Actions for `pytest` on push and `python -m build && twine upload`
    on tags.
-5. **PyPI alpha release.** `0.1.0a1` to claim the name. Test install from
+4. **PyPI alpha release.** `0.1.0a1` to claim the name. Test install from
    TestPyPI before pushing to real PyPI.
-6. **More adapters.** Slack export, Notion export, GitHub repo, RSS,
+5. **More adapters.** Slack export, Notion export, GitHub repo, RSS,
    Gmail mbox. See [docs/adapters.md](docs/adapters.md) §"Adapters worth
    writing".
 
@@ -105,10 +101,9 @@ the rationale in your PR.
 - **Caching layer.** Currently every extraction fetches fresh. Should we
   add an opt-in disk cache keyed on `canonical_uri`? Probably yes, but
   scope it carefully (TTL? invalidation? location?).
-- **defuddle integration mechanism.** Subprocess to `npx`? Bundle the JS
-  via a Python-Node bridge? User's existing wrapper at
-  `partnership-crm/ground-truth/ground-truth/tools/defuddle` uses subprocess
-  to `npx defuddle@0.14.0`. Probably matches that.
+- **Benchmark scoring.** What should count as "best" for each source type:
+  human readability, table fidelity, metadata recovery, low boilerplate,
+  speed, install size, or cost?
 - **GitHub org.** Repo URL is currently a placeholder
   (`github.com/docink/docink`). User needs to claim the org or use their
   personal namespace.

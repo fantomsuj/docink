@@ -19,7 +19,8 @@ def main() -> int:
     def extract(uri: str) -> dict:
         """Extract any URL or file path to agent-readable markdown with stable IDs.
 
-        Supported sources: web pages, PDFs, YouTube videos, Office docs (docx/pptx/xlsx).
+        Supported sources: web pages, PDFs, YouTube videos, Office docs
+        (docx/pptx/xlsx), and Readwise Reader documents.
         Returns the full Document including markdown body, frontmatter metadata, and
         addressable chunks.
         """
