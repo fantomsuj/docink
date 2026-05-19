@@ -34,16 +34,44 @@ file. The MCP client launches the process when it needs it.
 
 ## Tools exposed
 
+The server keeps an in-process LRU+TTL cache of extracted documents
+(default: 32 entries, 1h TTL) keyed by `doc_id`. The chunk-level tools
+below all share that cache, so a typical agent flow — `list_chunks` to
+see structure, then `get_chunk`/`search_chunks` to drill in — re-uses one
+extraction.
+
 ### `extract(uri: str) -> dict`
 
 Returns the full `Document` as a dict — markdown, metadata, chunks. Use
-this when the agent wants structured access (e.g., to address a specific
-chunk).
+this when the agent wants structured access in one shot. For long
+documents, prefer the chunk-level tools below so the full body doesn't
+land in context.
 
 ### `extract_markdown(uri: str) -> str`
 
 Returns just the markdown-with-frontmatter string. Use this when the agent
 just wants to read the content.
+
+### `list_chunks(uri: str) -> dict`
+
+Indexes a document's chunks without returning their full text. Returns
+`doc_id`, `chunk_count`, and one entry per chunk with `chunk_id`,
+`heading_path`, line range, character count, and a short preview. Cheap
+discovery step before `get_chunk`.
+
+### `get_chunk(uri: str, chunk_id: str) -> dict`
+
+Returns one addressable chunk by its `chunk_id` (e.g. `c3`). Re-uses the
+cached extraction if the URI was fetched recently. On an unknown
+`chunk_id`, raises with the list of available IDs.
+
+### `search_chunks(uri: str, query: str, limit: int = 5) -> dict`
+
+Ranks chunks by occurrences of the query terms (case-insensitive
+substring; heading-path matches weighted higher) and returns the top
+`limit` results with `chunk_id`, score, line range, and a snippet around
+the first match. Use for "where in this doc is X" questions before
+fetching full chunk text via `get_chunk`.
 
 ## Client configuration
 
@@ -125,10 +153,12 @@ You should see a JSON response describing the server.
 - **Adapter-owned auth.** The server pulls whatever URL you point it at.
   Authenticated sources handle auth inside the adapter. For example, the
   Readwise adapter relies on the user's local `readwise` CLI login.
-- **Single-shot.** Each `extract` call fetches fresh. There's no caching.
-  Wrap with a caching MCP middleware if you need it.
+- **In-process cache only.** Extracted documents are cached in memory
+  for the life of the server process (default 32 entries, 1h TTL). The
+  cache is dropped when the client disconnects and `docink-mcp` exits.
+  Wrap with an external cache if you need persistence across sessions.
 - **Process per call.** The agent launches `docink-mcp` once per session,
-  but every `extract` call is a synchronous blocking fetch inside that
+  but every fresh `extract` is a synchronous blocking fetch inside that
   process. Don't use it for high-volume crawling.
 
 ## Why not a remote HTTP server?

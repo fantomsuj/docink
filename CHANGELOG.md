@@ -15,6 +15,11 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `office` adapter (docx/pptx/xlsx) via markitdown.
 - Experimental `readwise` adapter via the official Readwise CLI.
 - Unit tests for ID canonicalization and chunking.
+- In-process `DocumentCache` (LRU+TTL, default 32 entries / 1h) so
+  repeated extractions of the same URI re-use one fetch.
+- MCP tools `list_chunks`, `get_chunk`, and `search_chunks` so agents
+  can index a document, fetch one addressable chunk, or rank chunks by
+  a query without pulling the whole body into context.
 
 ### Known gaps
 - docling backend deferred (PDF adapter is markitdown-only).

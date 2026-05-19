@@ -61,7 +61,15 @@ doc.to_markdown_with_frontmatter()
 docink-mcp                          # stdio MCP server
 ```
 
-Exposes one tool: `extract(uri) → Document`. Drop into Claude Desktop / Cursor / Cline config and any agent gets URL-and-file ingestion for free.
+Exposes five tools so agents can both pull a whole document and drill into it cheaply:
+
+- `extract(uri) → Document` — full document with markdown, metadata, chunks.
+- `extract_markdown(uri) → str` — markdown with YAML frontmatter only.
+- `list_chunks(uri) → dict` — chunk index (IDs, heading paths, previews) without full text.
+- `get_chunk(uri, chunk_id) → dict` — one addressable chunk by its `chunk_id` (e.g. `c3`).
+- `search_chunks(uri, query, limit=5) → dict` — rank chunks by query term frequency, with snippets.
+
+Drop into Claude Desktop / Cursor / Cline config and any agent gets URL-and-file ingestion for free. The server caches extractions in-process, so a `list_chunks` → `get_chunk` flow only fetches once.
 
 ## Output schema
 
